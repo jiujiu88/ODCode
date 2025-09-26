@@ -1,0 +1,58 @@
+/*
+题目描述：
+现代计算机系统中通常存在多级的存储设备，针对海量workload的优化的一种思路是将热点内存页优先放到快速存储层级，这就需要对内存页进行冷热标记。
+一种典型的方案是基于内存页的访问频次进行标记，如果统计窗口内访问次数大于等于设定阈值，则认为是热内存页，否则是冷内存页。
+对于统计窗口内跟踪到的访存序列和阈值，现在需要实现基于频次的冷热标记。内存页使用页框号作为标识。
+输入描述：
+第一行为输入为N，表示访存序列的记录条数，0<N<=10000
+第二行为访存序列，空格间隔的N个内存页框号，页框号范围0—65535，同一页框号可能重复出现，出现的次数即为对应页框号的频次。
+第三行为热内存页的频次阈值T，正整数，范围1<=T<=10000
+
+输出描述：
+第一行输出标记为热内存的内存页个数，如果没有被标记为热内存的，则输出0。
+如果第一行>0，则接下来按照访问频次降序输出内存页框号，一行一个，频次一样的页框号，页框号小的排前面。补充说明：
+
+示例1 输入：
+10
+1 2 1 2 1 2 1 2 1 2
+5
+
+输出：
+2
+1
+2
+
+说明：
+内存页1和内存页2均被访问了5次，达到了阈值5，因此热内存页有2个。
+内存页1和内存页2的访问频次相等，页框号小的排前面。
+————————————————
+版权声明：本文为CSDN博主「简单.is.good」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/weixin_45653183/article/details/141332723 */
+const rl = require("readline").createInterface({
+    input :process.stdin
+})
+var iter = rl[Symbol.asyncIterator]();
+const readline = async ()=>(await iter.next()).value;
+void (async function (){
+    const n = parseInt(await readline());
+    const list = (await readline()).split(" ").map(Number);
+    const t = parseInt(await readline());
+    getRes(list,n,t);
+})()
+
+// 思路：用对象存key：页框号，value：频率。用Object.entries(obj).filter获取符合target频率的数组，排序频次降序，页框号升序
+const getRes = (list,n,t)=>{
+    // console.log(list,n,t);
+    var obj = {};
+    for(let v of list){
+        if(obj[v]){
+            obj[v]++;
+        }else{
+            obj[v] = 1;
+        }
+    }
+    var arr = Object.entries(obj).filter(v=>v[1]>=5);
+    console.log(arr.length);
+    arr.sort((a,b)=>a[1]==b[1]?a[0]-b[0]:b[1]-a[1])
+        .forEach(v=>console.log(v[0]))
+}

@@ -476,3 +476,160 @@ var test1111 = function(height) {
     return res;
 };
 console.log(test1111([0,1,0,2,1,0,1,3,2,1,2,1]))
+
+var minGroups = function(intervals) {
+    // 分为多个组。按结束时间升序，能组合最多不相交的，放到一个组，这样就能划分最少的组。
+    const n = intervals.length;
+    intervals.sort((a,b)=>a[0]-b[0]);
+    // 存多个组
+    let res = [];
+    for(let v of intervals){
+        let i=0;
+        for(;i<res.length;i++){
+            let path = res[i];
+            // 如果不相交，加入该组,退出循环
+            if(v[0]>path[path.length-1][1]){
+                path.push(v);
+                break;
+            }
+        }
+        // 如果循环完了还没加入，则重新开一个组
+        if(i==res.length){
+            res.push([v]);
+        }
+    }
+    return res.length;
+};
+console.log(minGroups([[5,10],[6,8],[1,5],[2,3],[1,10]]))
+
+var videoStitching = function(clips, time) {
+    if(time==0){
+        return 0;
+    }
+    // 开始时间升序，相等则按结束时间降序
+    clips.sort((a,b)=>a[0]==b[0]?b[1]-a[1]:a[0]-b[0]);
+    let res = 0;
+    let cur = 0;
+    let next = 0;
+    let i=0;
+    while(i<clips.length){
+        // 在遇到下一个>right的左端点之前，一直找更大的右端点
+        while(i<clips.length && clips[i][0]<=cur){
+            next = Math.max(next,clips[i++][1]);
+        }
+        // 如果断档了，没进while循环，则返回-1
+        if(next==cur){
+            return -1;
+        }
+        // 找到之后，这一段会用，更新
+        res++;
+        cur = next;
+        if(cur>=time){
+            // 如果已经可以拼出[0,T]，则返回结果
+            return res;
+        }
+    }
+    return -1;
+};
+console.log(videoStitching([[0,2],[3,6]],6))
+
+
+var minTaps1 = function(n, ranges) {
+    // 先计算出区间，然后区间排序
+    let arr = [];
+    for(let i=0;i<n+1;i++){
+        arr.push([i-ranges[i],i+ranges[i]]);
+    }
+    arr.sort((a,b)=>a[0]-b[0]);
+    if(arr[0][0]>0){
+        return -1;
+    }
+    let cur = 0;
+    let next = 0;
+    let res = 0;
+    let i=0;
+    while(i<n+1){
+        while(i<n+1 && arr[i][0]<=cur){
+            next = Math.max(next,arr[i][1]);
+            i++;
+        }
+        // 如果断档了，返回-1
+        if(cur==next){
+            return -1;
+        }
+        // 如果while找完了上一个右端点的所有交集，找到下一个最大右端点，记录结果
+        res++;
+        cur = next;
+        // 如果已经灌溉到n了，就可以结束了
+        if(cur>=n){
+            return res;
+        }
+    }
+    return -1;
+};
+console.log(minTaps1(7,[1,2,1,0,2,1,0,1]))
+
+// 点 0 处的水龙头可以灌溉区间 [-3,3]
+// 点 1 处的水龙头可以灌溉区间 [-2,4]
+// 点 2 处的水龙头可以灌溉区间 [1,3]
+// 点 3 处的水龙头可以灌溉区间 [2,4]
+// 点 4 处的水龙头可以灌溉区间 [4,4]
+// 点 5 处的水龙头可以灌溉区间 [5,5]
+
+var minTaps = function(n, ranges) {
+    // 记录以其为左端点的子区间中最远的右端点，记为 rightMost[i]
+    let rightMost = new Array(n + 1).fill(0).map((i,idx)=>idx);
+    for(let i=0;i<n+1;i++){
+        // 左端点最小限制到0，负数没用
+        const start = Math.max(0, i - ranges[i]);
+        const end = Math.min(n, i + ranges[i]);
+        rightMost[start] = Math.max(rightMost[start], end);
+    }
+    let cur = 0;
+    // 当前能覆盖到的最远的右端点
+    let next = 0;
+    let res = 0;
+    for(let i=0;i<n;i++){  // 如果走到n-1时
+        next = Math.max(next,rightMost[i]);
+        // 如果断档了，返回-1
+        if(i==next){
+            return -1;
+        }
+        if(i==cur){
+            // 如果走到桥的右端点，用了一座桥，可以走到下一座桥的右端点更新
+            res++;
+            cur = next;
+        }
+    }
+    return res;
+};
+console.log(minTaps(5,[3,3,1,1,0,0]))
+
+var sortedSquares = function(nums) {
+    // 思路，如果是负数，值越小，平方后值越大，用双指针
+    // 快慢指针依次计算平方，然后比较，小的放前面且移动那个指针
+    // i是循环指针
+    let i = nums.length-1;
+    let left = 0,right = nums.length-1;
+    while(left<=right){
+        console.log(left,right)
+        let l = nums[left]*nums[left];
+        let r = nums[right]*nums[right];
+        console.log(nums[right])
+        console.log(l,r)
+        if(l<r){
+            nums[i] = r;
+            right--;
+        }else{
+            nums[i] = l;
+            left++;
+        }
+        i--;
+    }
+    return nums;
+
+};
+console.log(sortedSquares([-4,-1,0,3,10]))
+
+
+

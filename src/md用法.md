@@ -57,3 +57,23 @@ printf("HelloWorld");
 2. 有序列表 2
    2.1 有序列表2.1
 
+(function () {
+'use strict';
+var elements = document.getElementsByTagName('pre');
+for (var i = 0; i < elements.length; i++) {
+var element = elements[i];
+element.innerHTML = element.innerHTML.replace(/signin/g, 'copyCode');
+}
+window.oncontextmenu = document.oncontextmenu = document.oncopy = null;
+var bodies = document.querySelectorAll('body');
+bodies.forEach(function (body) {
+var displayStyle = body.style.display;
+body.style.display = 'none';
+void body.offsetWidth;
+body.style.display = displayStyle;
+});
+[...document.querySelectorAll('body, body *')].forEach(dom => {
+['onselect', 'onselectstart', 'onselectend', 'ondragstart', 'ondragend', 'oncontextmenu', 'oncopy'].forEach(ev => dom.removeAttribute(ev));
+dom.style['user-select'] = 'auto';
+});
+})();
